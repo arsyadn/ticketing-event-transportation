@@ -54,7 +54,7 @@ func RoleAdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roleInterface, exists := c.Get("user_role")
 
-		if !exists || roleInterface != "admin" {
+		if !exists || roleInterface != "Admin" {
 			c.JSON(403, gin.H{"error": "Only admin can access this resource"})
 			c.Abort()
 			return
@@ -67,7 +67,7 @@ func RoleAdminMiddleware() gin.HandlerFunc {
 func RoleUserMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRole, exists := c.Get("user_role")
-		if !exists || userRole != "user" {
+		if !exists || userRole != "User" {
 			c.JSON(403, gin.H{"error": "Only user can access this resource"})
 			c.Abort()
 			return
