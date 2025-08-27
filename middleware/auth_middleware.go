@@ -33,7 +33,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		userId, err := utils.ValidateToken(parts[1])
+		userId, role, err := utils.ValidateToken(parts[1])
 		if err != nil {
 			c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
 			c.Header("Access-Control-Allow-Credentials", "true")
@@ -43,6 +43,36 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user_id", userId)
+		c.Set("user_role", role)
+		c.Next()
+	}
+}
+
+
+
+func RoleAdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		roleInterface, exists := c.Get("user_role")
+
+		if !exists || roleInterface != "admin" {
+			c.JSON(403, gin.H{"error": "Only admin can access this resource"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func RoleUserMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("user_role")
+		if !exists || userRole != "user" {
+			c.JSON(403, gin.H{"error": "Only user can access this resource"})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }
