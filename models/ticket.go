@@ -14,6 +14,7 @@ type BuyTicket struct {
 }
 
 type TicketResponse struct {
+	UserID   uint64 `json:"user_id"`
 	TicketID uint64 `json:"ticket_id"`
 	Name     string `json:"name"`
 	Email    string `json:"email"`

@@ -26,5 +26,6 @@ func SetupTicketRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	{
 		protected.POST("", TicketController.CreateTicket)
 		protected.GET("", TicketController.GetAllTickets)
+		protected.GET("/:id", TicketController.GetTicketByID)
 	}
 }

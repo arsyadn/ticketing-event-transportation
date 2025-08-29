@@ -16,6 +16,7 @@ type TicketRepository interface {
 	UpdateStatus(tx any, id uint64, status string) error
 	GetAllTicketEvents() ([]models.TicketResponse, error)
 	GetAllTicketEventsUserOnly(userId uint64) ([]models.TicketResponse, error)
+	GetTicketByID(ticketID uint64) (*models.TicketResponse, error)
 }
 
 
@@ -78,6 +79,7 @@ func (r *ticketRepository) GetAllTicketEventsUserOnly(userId uint64) ([]models.T
 	err := r.db.Raw(`
 		select 
 			t.id as ticket_id,
+			u.id as user_id,
 			u.name,
 			u.email,
 			e.name as event_name,
@@ -92,4 +94,25 @@ func (r *ticketRepository) GetAllTicketEventsUserOnly(userId uint64) ([]models.T
 		return nil, err
 	}
 	return tickets, nil
+}
+
+func (r *ticketRepository) GetTicketByID(ticketID uint64) (*models.TicketResponse, error) {
+	var ticket models.TicketResponse
+	err := r.db.Raw(
+		`select 
+			t.id as ticket_id,
+			u.id as user_id,
+			u.name,
+			u.email,
+			e.name as event_name,
+			e.description as event_desc,
+			e.category as event_category
+		from tickets t
+		join events e on e.id = t.event_id
+		join users u on u.id = t.user_id
+		where t.id = ?`, ticketID).Scan(&ticket).Error
+	if err != nil {
+		return nil, err
+	}
+	return &ticket, nil
 }

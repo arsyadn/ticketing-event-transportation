@@ -13,6 +13,7 @@ import (
 type TicketService interface {
 	CreateTicket(ticket *models.BuyTicket) error
 	GetAllTickets(userId uint64, userRole string) ([]models.TicketResponse, error)
+	GetTicketByID(ticketID uint64, userID uint64, userRole string) (*models.TicketResponse, error)
 }
 
 type ticketService struct {
@@ -102,4 +103,18 @@ func (s *ticketService) GetAllTickets(userId uint64, userRole string) ([]models.
 		return s.repo.GetAllTicketEvents()
 	}
 	return s.repo.GetAllTicketEventsUserOnly(userId)
+}
+
+func (s *ticketService) GetTicketByID(ticketID uint64, userId uint64, userRole string) (*models.TicketResponse, error) {
+	ticket, err := s.repo.GetTicketByID(ticketID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the user has permission to view the ticket
+	if userRole != "Admin" && ticket.UserID != userId {
+		return nil, fmt.Errorf("access denied")
+	}
+
+	return ticket, nil
 }
